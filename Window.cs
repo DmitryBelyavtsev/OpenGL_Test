@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -79,6 +80,10 @@ public class Window : GameWindow
         elementBufferObject = GL.GenBuffer();
         GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
         GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+
+        //Получить максимальное количество аттрибутов вершин поддерживаемых видеокартой
+        GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
+        Console.WriteLine($"Maximum number of vertex attributes supported: {maxAttributeCount}");
 
         //Создание объекта шейдера
         shader = new("Shaders/default.vert", "Shaders/default.frag");
