@@ -74,4 +74,9 @@ public class Shader
             throw new Exception($"Error occurred whilst linking Program({program})");
         }
     }
+
+    public void Use()
+    {
+        GL.UseProgram(Handle);
+    }
 }
