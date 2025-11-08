@@ -103,9 +103,23 @@ public class Window : GameWindow
 
         var input = KeyboardState;
 
-        if(input.IsKeyDown(Keys.Escape))
+        if (input.IsKeyDown(Keys.Escape))
         {
             Close();
         }
+    }
+
+    protected override void OnUnload()
+    {
+        GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        GL.BindVertexArray(0);
+        GL.UseProgram(0);
+
+        GL.DeleteBuffer(vertexBufferObject);
+        GL.DeleteVertexArray(vertexArrayObject);
+
+        GL.DeleteProgram(shader.Handle);
+
+        base.OnUnload();
     }
 }
