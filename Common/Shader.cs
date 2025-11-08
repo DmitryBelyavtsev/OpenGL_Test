@@ -21,8 +21,25 @@ public class Shader
         CompileShader(vertexShader);
         CompileShader(fragShader);
 
+        //Создание программы шейдеров
+        Handle = GL.CreateProgram();
+
+        //Добавление шейдера в программу шейдера
+        GL.AttachShader(Handle, vertexShader);
+        GL.AttachShader(Handle, fragShader);
+
+        //Линковка программы, соединяет шейдеры и программу, компилирует их
+        LinkProgram(Handle);
+
+        //Программа скомпилирована, шейдеры больше не нужны
+        GL.DetachShader(Handle, vertexShader);
+        GL.DetachShader(Handle, fragShader);
+
+        //Полное удаление шейдеров из памяти (они внутри программы на этапе linkProgram)
+        GL.DeleteShader(vertexShader);
+        GL.DeleteShader(fragShader);
     }
-    
+
     /// <summary>
     /// Компилирует шейдер принимая дескриптор на объект шейдера
     /// </summary>
@@ -33,7 +50,7 @@ public class Shader
 
         //Получает доступ к полю объекта шейдера CompileStatus выводит результат в result
         GL.GetShader(shader, ShaderParameter.CompileStatus, out int result);
-        
+
         //Результат компиляции int, проверка на истину
         if (result != (int)All.True)
         {
@@ -42,6 +59,19 @@ public class Shader
 
             //Выдача ошибки в случае неудачи
             throw new Exception($"Error occurred whilst copiling Shader({shader}).\n\n{infoLog}");
+        }
+    }
+
+    private static void LinkProgram(int program)
+    {
+        GL.LinkProgram(program);
+
+        GL.GetProgram(program, GetProgramParameterName.LinkStatus, out int result);
+        if (result != (int)All.True)
+        {
+            GL.GetProgramInfoLog(program);
+
+            throw new Exception($"Error occurred whilst linking Program({program})");
         }
     }
 }
