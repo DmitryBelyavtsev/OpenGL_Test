@@ -17,10 +17,9 @@ public class Window : GameWindow
     //Вершины треугольника
     private float[] vertices =
     {
-        .5f, .5f, 0f,
-        .5f, -.5f, 0f,
-        -.5f, -.5f, 0f,
-        -.5f, .5f, 0f
+        .5f, -.5f, 0f, 1f, 0f, 0f,
+        -.5f, -.5f, 0f, 0f, 1f, 0f,
+        0f, .5f, 0f, 0f, 0f, 1f
     };
 
     private readonly uint[] indices =
@@ -72,16 +71,11 @@ public class Window : GameWindow
         //   Offset; это сколько байтов нужно пропустить, чтобы найти первый элемент первой вершины. 0 на данный момент.
         // Stride и Offset пока просто упомянуты, но когда мы дойдем до текстурных координат, они будут показаны более подробно.
 
-        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+        GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
         //Включение переменной в шейдере
         GL.EnableVertexAttribArray(0);
-
-        //Создание объекта буффера для EBO, обязательно после VAO
-        //EBO является свойством VAO
-        elementBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
-        GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+        GL.EnableVertexAttribArray(1);
 
         //Получить максимальное количество аттрибутов вершин поддерживаемых видеокартой
         GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
@@ -114,15 +108,8 @@ public class Window : GameWindow
         //Привязываем vao 
         GL.BindVertexArray(vertexArrayObject);
 
-        double timeValue = timer.Elapsed.TotalSeconds;
-        float greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
-        float redValue = (float)Math.Cos(timeValue) / 2.0f + 0.5f;
-        float blueValue = (float)Math.Cos(timeValue) / 2.0f + 0.5f;
-        int vertexColorLocation = GL.GetUniformLocation(shader.Handle, "ourColor");
-        GL.Uniform4(vertexColorLocation, redValue, greenValue, blueValue, 1f);
-
         //Рисуем элементы
-        GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
