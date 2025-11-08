@@ -12,6 +12,8 @@ public class Window : GameWindow
     private int vertexArrayObject;
     private int elementBufferObject;
 
+    private Stopwatch timer;
+
     //Вершины треугольника
     private float[] vertices =
     {
@@ -87,9 +89,12 @@ public class Window : GameWindow
 
         //Создание объекта шейдера
         shader = new("Shaders/default.vert", "Shaders/default.frag");
-        
+
         //Использовать шейдерную программу
         shader.Use();
+
+        timer = new();
+        timer.Start();
     }
 
     /// <summary>
@@ -108,6 +113,13 @@ public class Window : GameWindow
 
         //Привязываем vao 
         GL.BindVertexArray(vertexArrayObject);
+
+        double timeValue = timer.Elapsed.TotalSeconds;
+        float greenValue = (float)Math.Sin(timeValue) / 2.0f + 0.5f;
+        float redValue = (float)Math.Cos(timeValue) / 2.0f + 0.5f;
+        float blueValue = (float)Math.Cos(timeValue) / 2.0f + 0.5f;
+        int vertexColorLocation = GL.GetUniformLocation(shader.Handle, "ourColor");
+        GL.Uniform4(vertexColorLocation, redValue, greenValue, blueValue, 1f);
 
         //Рисуем элементы
         GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
