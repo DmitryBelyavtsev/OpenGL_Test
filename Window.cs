@@ -1,6 +1,7 @@
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 public class Window : GameWindow
 {
@@ -94,5 +95,17 @@ public class Window : GameWindow
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
+    }
+
+    protected override void OnUpdateFrame(FrameEventArgs args)
+    {
+        base.OnUpdateFrame(args);
+
+        var input = KeyboardState;
+
+        if(input.IsKeyDown(Keys.Escape))
+        {
+            Close();
+        }
     }
 }
