@@ -9,13 +9,21 @@ public class Window : GameWindow
 
     private int vertexBufferObject;
     private int vertexArrayObject;
+    private int elementBufferObject;
 
     //Вершины треугольника
     private float[] vertices =
     {
-        -.5f, -.5f, 0f,
+        .5f, .5f, 0f,
         .5f, -.5f, 0f,
-        0f, .5f, 0f
+        -.5f, -.5f, 0f,
+        -.5f, .5f, 0f
+    };
+
+    private readonly uint[] indices =
+    {
+        0,1,3,
+        1,2,3
     };
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -66,6 +74,12 @@ public class Window : GameWindow
         //Включение переменной в шейдере
         GL.EnableVertexAttribArray(0);
 
+        //Создание объекта буффера для EBO, обязательно после VAO
+        //EBO является свойством VAO
+        elementBufferObject = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
+        GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+
         //Создание объекта шейдера
         shader = new("Shaders/default.vert", "Shaders/default.frag");
         
@@ -90,8 +104,8 @@ public class Window : GameWindow
         //Привязываем vao 
         GL.BindVertexArray(vertexArrayObject);
 
-        //Рисуем три вершины треугольника
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+        //Рисуем элементы
+        GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
