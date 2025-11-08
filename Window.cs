@@ -109,6 +109,14 @@ public class Window : GameWindow
         }
     }
 
+    protected override void OnResize(ResizeEventArgs e)
+    {
+        base.OnResize(e);
+
+        //Нужно вызывать для перерасчёта NDC 
+        GL.Viewport(0, 0, Size.X, Size.Y);
+    }
+
     protected override void OnUnload()
     {
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
