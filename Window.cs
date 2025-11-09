@@ -14,22 +14,22 @@ public class Window : GameWindow
 
     private Stopwatch timer;
 
-    private Texture texture;
-
-    //Вершины треугольника
+    //Вершины прямоугольника с текстурными координатами
     private float[] vertices =
     {
-        -.5f, -.5f, 0f,
-        .5f, -.5f, 0f,
-        0f, .5f, 0f
+        .5f, .5f, 0f, 1f, 1f,
+        .5f, -.5f, 0f, 1f, 0f,
+        -.5f, -.5f, 0f, 0f, 0f,
+        -.5f, .5f, 0f, 0f, 1f
     };
 
-    private float[] texCoord =
+    private int[] indices =
     {
-        0f, 0f,
-        1f, 0f,
-        .5f, 1f
+        0, 1, 3,
+        1, 2, 3
     };
+
+    private Texture texture;
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -63,6 +63,12 @@ public class Window : GameWindow
         vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(vertexArrayObject);
 
+        //Создание и запись буффера элементов
+        elementBufferObject = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
+        GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
+        
+
         // Эта функция имеет две задачи: рассказать OpenGL о формате данных, а также связать текущий array buffer с VAO.
         // Это означает, что после этого вызова мы настроили этот атрибут для получения данных из текущего array buffer и интерпретации их указанным способом.
         // Аргументы:
@@ -74,11 +80,7 @@ public class Window : GameWindow
         //   Offset; это сколько байтов нужно пропустить, чтобы найти первый элемент первой вершины. 0 на данный момент.
         // Stride и Offset пока просто упомянуты, но когда мы дойдем до текстурных координат, они будут показаны более подробно.
 
-        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-        GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-        //Включение переменной в шейдере
-        GL.EnableVertexAttribArray(0);
-        GL.EnableVertexAttribArray(1);
+        
 
         //Получить максимальное количество аттрибутов вершин поддерживаемых видеокартой
         GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
@@ -86,25 +88,20 @@ public class Window : GameWindow
 
         //Создание объекта шейдера
         shader = new("Shaders/default.vert", "Shaders/default.frag");
-
         //Использовать шейдерную программу
         shader.Use();
 
         //получить индекс переменной glsl, обозначить интерпритацию данных для opengl
         var vertexLocation = shader.GetAttribLocation("aPosition");
         GL.EnableVertexAttribArray(vertexLocation);
-        GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+        GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
 
-        var texCoordLocation = shader.GetAttribLocation("aTexCoord");
-        GL.EnableVertexAttribArray(texCoordLocation);
-
-        var textureCoordBuffer = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, textureCoordBuffer);
-        GL.BufferData(BufferTarget.ArrayBuffer, texCoord.Length * sizeof(float), texCoord, BufferUsageHint.StaticDraw);
-        GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+        var textCoordLocation = shader.GetAttribLocation("aTexCoord");
+        GL.EnableVertexAttribArray(textCoordLocation);
+        GL.VertexAttribPointer(textCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
 
         //Загрузка текстур
-        texture = Texture.LoadFromFile("Resources/wall.jpg");
+        texture = Texture.LoadFromFile("Resources/container.jpg");
         texture.Use(TextureUnit.Texture0);
         
         timer = new();
@@ -129,7 +126,7 @@ public class Window : GameWindow
         GL.BindVertexArray(vertexArrayObject);
 
         //Рисуем элементы
-        GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Length);
+        GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
