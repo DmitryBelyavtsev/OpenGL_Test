@@ -79,4 +79,9 @@ public class Shader
     {
         GL.UseProgram(Handle);
     }
+
+    public int GetAttribLocation(string str)
+    {
+        return GL.GetAttribLocation(Handle, str);
+    }
 }

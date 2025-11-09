@@ -14,18 +14,21 @@ public class Window : GameWindow
 
     private Stopwatch timer;
 
+    private Texture texture;
+
     //Вершины треугольника
     private float[] vertices =
     {
-        .5f, -.5f, 0f, 1f, 0f, 0f,
-        -.5f, -.5f, 0f, 0f, 1f, 0f,
-        0f, .5f, 0f, 0f, 0f, 1f
+        -.5f, -.5f, 0f,
+        .5f, -.5f, 0f,
+        0f, .5f, 0f
     };
 
-    private readonly uint[] indices =
+    private float[] texCoord =
     {
-        0,1,3,
-        1,2,3
+        0f, 0f,
+        1f, 0f,
+        .5f, 1f
     };
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -87,6 +90,23 @@ public class Window : GameWindow
         //Использовать шейдерную программу
         shader.Use();
 
+        //получить индекс переменной glsl, обозначить интерпритацию данных для opengl
+        var vertexLocation = shader.GetAttribLocation("aPosition");
+        GL.EnableVertexAttribArray(vertexLocation);
+        GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+
+        var texCoordLocation = shader.GetAttribLocation("aTexCoord");
+        GL.EnableVertexAttribArray(texCoordLocation);
+
+        var textureCoordBuffer = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ArrayBuffer, textureCoordBuffer);
+        GL.BufferData(BufferTarget.ArrayBuffer, texCoord.Length * sizeof(float), texCoord, BufferUsageHint.StaticDraw);
+        GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+
+        //Загрузка текстур
+        texture = Texture.LoadFromFile("Resources/wall.jpg");
+        texture.Use(TextureUnit.Texture0);
+        
         timer = new();
         timer.Start();
     }
@@ -109,7 +129,7 @@ public class Window : GameWindow
         GL.BindVertexArray(vertexArrayObject);
 
         //Рисуем элементы
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+        GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Length);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
