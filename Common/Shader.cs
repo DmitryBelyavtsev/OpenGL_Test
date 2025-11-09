@@ -84,4 +84,11 @@ public class Shader
     {
         return GL.GetAttribLocation(Handle, str);
     }
+
+    public void SetInt(string name, int value)
+    {
+        int location = GL.GetUniformLocation(Handle, name);
+
+        GL.Uniform1(location, value);
+    }
 }

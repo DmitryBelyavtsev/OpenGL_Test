@@ -30,6 +30,7 @@ public class Window : GameWindow
     };
 
     private Texture texture;
+    private Texture texture1;
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -103,6 +104,11 @@ public class Window : GameWindow
         //Загрузка текстур
         texture = Texture.LoadFromFile("Resources/container.jpg");
         texture.Use(TextureUnit.Texture0);
+        texture1 = Texture.LoadFromFile("Resources/awesomeface.png");
+        texture1.Use(TextureUnit.Texture1);
+
+        shader.SetInt("texture0", 0);
+        shader.SetInt("texture1", 1);
         
         timer = new();
         timer.Start();
@@ -119,6 +125,8 @@ public class Window : GameWindow
         //Заливает экран цветом из буффера настроенным из GL.ClearColor
         GL.Clear(ClearBufferMask.ColorBufferBit);
 
+        texture.Use(TextureUnit.Texture0);
+        texture1.Use(TextureUnit.Texture1);
         //Привязываем шейдер
         shader.Use();
 
