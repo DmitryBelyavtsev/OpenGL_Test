@@ -1,8 +1,10 @@
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 public class Shader
 {
     public readonly int Handle;
 
+    private readonly Dictionary<string, int> uniformLocations;
     public Shader(string vertPath, string fragPath)
     {
         // Чтение исходного кода шейдеров
@@ -38,6 +40,20 @@ public class Shader
         //Полное удаление шейдеров из памяти (они внутри программы на этапе linkProgram)
         GL.DeleteShader(vertexShader);
         GL.DeleteShader(fragShader);
+
+
+        GL.GetProgram(Handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
+
+        uniformLocations = new();
+
+        for(var i = 0; i < numberOfUniforms; i ++)
+        {
+            var key = GL.GetActiveUniform(Handle, i, out _, out _);
+
+            var location = GL.GetUniformLocation(Handle, key);
+
+            uniformLocations.Add(key, location);
+        }
     }
 
     /// <summary>
@@ -90,5 +106,12 @@ public class Shader
         int location = GL.GetUniformLocation(Handle, name);
 
         GL.Uniform1(location, value);
+    }
+
+    public void SetMatrix4(string name, Matrix4 data)
+    {
+        GL.UseProgram(Handle);
+
+        GL.UniformMatrix4(uniformLocations[name],true, ref data);
     }
 }

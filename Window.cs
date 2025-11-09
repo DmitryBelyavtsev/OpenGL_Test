@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -132,6 +133,16 @@ public class Window : GameWindow
 
         //Привязываем vao 
         GL.BindVertexArray(vertexArrayObject);
+
+        var transform = Matrix4.Identity;
+
+        transform = transform * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(90f));
+
+        transform = transform * Matrix4.CreateScale(1.1f);
+
+        transform = transform * Matrix4.CreateTranslation(.1f, .1f, 0f);
+
+        shader.SetMatrix4("transform", transform);
 
         //Рисуем элементы
         GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
