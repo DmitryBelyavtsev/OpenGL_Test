@@ -13,7 +13,14 @@ public class Window : GameWindow
     private int vertexArrayObject;
     private int elementBufferObject;
 
+    private double time;
     private Stopwatch timer;
+
+    //Матрица вида
+    private Matrix4 view;
+
+    //Проекция камеры
+    private Matrix4 projection;
 
     //Вершины прямоугольника с текстурными координатами
     private float[] vertices =
@@ -47,6 +54,8 @@ public class Window : GameWindow
 
         //Цвет окна после очистки нужен для вызова GL.Clear в OnRenderFrame
         GL.ClearColor(0.2f, 0.3f, 0.3f, 1f);
+
+        GL.Enable(EnableCap.DepthTest);
 
         //Создание буффера объектов
         vertexBufferObject = GL.GenBuffer();
@@ -110,6 +119,10 @@ public class Window : GameWindow
 
         shader.SetInt("texture0", 0);
         shader.SetInt("texture1", 1);
+
+        view = Matrix4.CreateTranslation(0f, 0f, -3f);
+
+        projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), Size.X / (float) Size.Y, 0.1f, 100.0f);
         
         timer = new();
         timer.Start();
@@ -123,26 +136,27 @@ public class Window : GameWindow
     {
         base.OnRenderFrame(args);
 
+        time += 16.0 * args.Time;
+
         //Заливает экран цветом из буффера настроенным из GL.ClearColor
-        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         texture.Use(TextureUnit.Texture0);
         texture1.Use(TextureUnit.Texture1);
         //Привязываем шейдер
         shader.Use();
 
+        //позиции модели
+        var model = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(time))
+        * Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(time));
+        //* Matrix4.CreateRotationZ((float)MathHelper.DegreesToRadians(time));
+
         //Привязываем vao 
         GL.BindVertexArray(vertexArrayObject);
 
-        var transform = Matrix4.Identity;
-
-        transform = transform * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(90f));
-
-        transform = transform * Matrix4.CreateScale(1.1f);
-
-        transform = transform * Matrix4.CreateTranslation(.1f, .1f, 0f);
-
-        shader.SetMatrix4("transform", transform);
+        shader.SetMatrix4("model", model);
+        shader.SetMatrix4("view", view);
+        shader.SetMatrix4("projection", projection);
 
         //Рисуем элементы
         GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
