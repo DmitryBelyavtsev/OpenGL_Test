@@ -16,11 +16,11 @@ public class Window : GameWindow
     private double time;
     private Stopwatch timer;
 
-    //Матрица вида
-    private Matrix4 view;
+    private Camera camera;
 
-    //Проекция камеры
-    private Matrix4 projection;
+    private bool firstMove = true;
+
+    private Vector2 lastPosition;
 
     //Вершины прямоугольника с текстурными координатами
     private float[] vertices =
@@ -120,9 +120,10 @@ public class Window : GameWindow
         shader.SetInt("texture0", 0);
         shader.SetInt("texture1", 1);
 
-        view = Matrix4.CreateTranslation(0f, 0f, -3f);
+        camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
 
-        projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), Size.X / (float) Size.Y, 0.1f, 100.0f);
+        //захват курсора
+        CursorState = CursorState.Grabbed;
         
         timer = new();
         timer.Start();
@@ -155,8 +156,8 @@ public class Window : GameWindow
         GL.BindVertexArray(vertexArrayObject);
 
         shader.SetMatrix4("model", model);
-        shader.SetMatrix4("view", view);
-        shader.SetMatrix4("projection", projection);
+        shader.SetMatrix4("view", camera.GetViewMatrix());
+        shader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
         //Рисуем элементы
         GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
@@ -169,12 +170,72 @@ public class Window : GameWindow
     {
         base.OnUpdateFrame(args);
 
+        if(!IsFocused) return;
+
         var input = KeyboardState;
 
         if (input.IsKeyDown(Keys.Escape))
         {
             Close();
         }
+
+        const float cameraSpeed = 1.5f;
+        const float sensitivity = .2f;
+
+        if(input.IsKeyDown(Keys.W))
+        {
+            camera.Position += camera.Front * cameraSpeed * (float)args.Time;
+        }
+
+        if(input.IsKeyDown(Keys.S))
+        {
+            camera.Position -= camera.Front * cameraSpeed * (float)args.Time;
+        }
+
+        if(input.IsKeyDown(Keys.A))
+        {
+            camera.Position -= camera.Right * cameraSpeed * (float)args.Time;
+        }
+
+        if(input.IsKeyDown(Keys.D))
+        {
+            camera.Position += camera.Right * cameraSpeed * (float)args.Time;
+        }
+
+        if(input.IsKeyDown(Keys.Space))
+        {
+            camera.Position += camera.Up * cameraSpeed * (float)args.Time;
+        }
+
+        if(input.IsKeyDown(Keys.LeftShift))
+        {
+            camera.Position -= camera.Up * cameraSpeed * (float)args.Time;
+        }
+
+        var mouse = MouseState;
+
+        if(firstMove)
+        {
+            lastPosition = new Vector2(mouse.X, mouse.Y);
+            firstMove = false;
+        }
+        else
+        {
+            var deltaX = mouse.X - lastPosition.X;
+            var deltaY = mouse.Y - lastPosition.Y;
+
+            lastPosition = new(mouse.X, mouse.Y);
+
+            camera.Yaw += deltaX * sensitivity;
+            camera.Pitch -= deltaY * sensitivity;
+        }
+    }
+
+    protected override void OnMouseWheel(MouseWheelEventArgs e)
+    {
+        base.OnMouseWheel(e);
+
+        camera.Fov -= e.OffsetY;
     }
 
     protected override void OnResize(ResizeEventArgs e)
@@ -183,6 +244,8 @@ public class Window : GameWindow
 
         //Нужно вызывать для перерасчёта NDC 
         GL.Viewport(0, 0, Size.X, Size.Y);
+
+        camera.AspectRatio = Size.X / (float)Size.Y;
     }
 
     protected override void OnUnload()
