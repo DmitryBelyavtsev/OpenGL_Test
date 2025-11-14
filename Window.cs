@@ -7,14 +7,15 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 public class Window : GameWindow
 {
-    private Shader shader;
+    private Shader lampShader;
+    private Shader lightingShader;
 
     private int vertexBufferObject;
-    private int vertexArrayObject;
+    private int vaoModel;
+    private int vaoLamp;
     private int elementBufferObject;
 
     private double time;
-    private Stopwatch timer;
 
     private Camera camera;
 
@@ -22,59 +23,56 @@ public class Window : GameWindow
 
     private Vector2 lastPosition;
 
-    //Вершины прямоугольника с текстурными координатами
-    float[] vertices = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    private readonly float[] vertices =
+        {
+            // Позиция
+            -0.5f, -0.5f, -0.5f, // Передняя грань
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f, // Задняя грань
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f, // Левая грань
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f, // Правая грань
+             0.5f,  0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, // Нижняя грань
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
-    private int[] indices =
-    {
-        0, 1, 3,
-        1, 2, 3
-    };
+            -0.5f,  0.5f, -0.5f, // Верхняя грань
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f
+        };
 
     private Texture texture;
     private Texture texture1;
+
+    private readonly Vector3 lightPosition = new Vector3(1.2f, 1f, 2f);
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -89,7 +87,7 @@ public class Window : GameWindow
         base.OnLoad();
 
         //Цвет окна после очистки нужен для вызова GL.Clear в OnRenderFrame
-        GL.ClearColor(0.2f, 0.3f, 0.3f, 1f);
+        GL.ClearColor(0f, 0f, 0f, 1f);
 
         GL.Enable(EnableCap.DepthTest);
 
@@ -102,67 +100,34 @@ public class Window : GameWindow
         // Запись данных о вершинах треугольника в vbo
         GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
-        // Особенность данного буффера в том что драйвер opengl, 
-        // не знает как интерпретировать данные,
-        // поэтому нужно через объект VAO скачать как их интерпретировать.
+        //Создание объекта шейдера
+        lightingShader = new("Shaders/default.vert", "Shaders/lighting.frag");
+        lampShader = new("Shaders/default.vert", "Shaders/default.frag");
 
         //Создание VAO
-        vertexArrayObject = GL.GenVertexArray();
-        GL.BindVertexArray(vertexArrayObject);
+        {
+            vaoModel = GL.GenVertexArray();
+            GL.BindVertexArray(vaoModel);
 
-        //Создание и запись буффера элементов
-        elementBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
-        GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
-        
+            var vertexLocation = lightingShader.GetAttribLocation("aPos");
+            GL.EnableVertexAttribArray(vertexLocation);
+            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+        }
 
-        // Эта функция имеет две задачи: рассказать OpenGL о формате данных, а также связать текущий array buffer с VAO.
-        // Это означает, что после этого вызова мы настроили этот атрибут для получения данных из текущего array buffer и интерпретации их указанным способом.
-        // Аргументы:
-        //   Location входной переменной в шейдере. Строка layout(location = 0) в вершинном шейдере явно устанавливает его в 0.
-        //   Сколько элементов будет отправлено в переменную. В этом случае 3 float'а на каждую вершину.
-        //   Тип данных элементов, в этом случае float.
-        //   Должны ли данные быть преобразованы в нормализованные координаты устройства. В этом случае false, потому что это уже сделано.
-        //   Stride; это сколько байтов между последним элементом одной вершины и первым элементом следующей. 3 * sizeof(float) в этом случае.
-        //   Offset; это сколько байтов нужно пропустить, чтобы найти первый элемент первой вершины. 0 на данный момент.
-        // Stride и Offset пока просто упомянуты, но когда мы дойдем до текстурных координат, они будут показаны более подробно.
+        {
+            vaoLamp = GL.GenVertexArray();
+            GL.BindVertexArray(vaoLamp);
 
-        
-
-        //Получить максимальное количество аттрибутов вершин поддерживаемых видеокартой
-        GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
-        Console.WriteLine($"Maximum number of vertex attributes supported: {maxAttributeCount}");
-
-        //Создание объекта шейдера
-        shader = new("Shaders/default.vert", "Shaders/default.frag");
-        //Использовать шейдерную программу
-        shader.Use();
-
-        //получить индекс переменной glsl, обозначить интерпритацию данных для opengl
-        var vertexLocation = shader.GetAttribLocation("aPosition");
-        GL.EnableVertexAttribArray(vertexLocation);
-        GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
-
-        var textCoordLocation = shader.GetAttribLocation("aTexCoord");
-        GL.EnableVertexAttribArray(textCoordLocation);
-        GL.VertexAttribPointer(textCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
-
-        //Загрузка текстур
-        texture = Texture.LoadFromFile("Resources/container.jpg");
-        texture.Use(TextureUnit.Texture0);
-        texture1 = Texture.LoadFromFile("Resources/awesomeface.png");
-        texture1.Use(TextureUnit.Texture1);
-
-        shader.SetInt("texture0", 0);
-        shader.SetInt("texture1", 1);
+            var vertexLocation = lampShader.GetAttribLocation("aPos");
+            GL.EnableVertexAttribArray(vertexLocation);
+            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+        }
 
         camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
 
         //захват курсора
         CursorState = CursorState.Grabbed;
         
-        timer = new();
-        timer.Start();
     }
 
     /// <summary>
@@ -178,24 +143,33 @@ public class Window : GameWindow
         //Заливает экран цветом из буффера настроенным из GL.ClearColor
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        texture.Use(TextureUnit.Texture0);
-        texture1.Use(TextureUnit.Texture1);
+        GL.BindVertexArray(vaoModel);
+
         //Привязываем шейдер
-        shader.Use();
+        lightingShader.Use();
 
-        //позиции модели
-        var model = Matrix4.Identity * Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(time));
-        //* Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(time));
-        //* Matrix4.CreateRotationZ((float)MathHelper.DegreesToRadians(time));
+        lightingShader.SetMatrix4("model", Matrix4.Identity);
+        lightingShader.SetMatrix4("view", camera.GetViewMatrix());
+        lightingShader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
-        //Привязываем vao 
-        GL.BindVertexArray(vertexArrayObject);
-
-        shader.SetMatrix4("model", model);
-        shader.SetMatrix4("view", camera.GetViewMatrix());
-        shader.SetMatrix4("projection", camera.GetProjectionMatrix());
+        lightingShader.SetVector3("objectColor", new Vector3(1f, .5f, .31f));
+        lightingShader.SetVector3("lightColor", new Vector3(1f, 1f, 1f));
 
         //Рисуем элементы
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+
+        GL.BindVertexArray(vaoLamp);
+
+        lampShader.Use();
+
+        var lampMatrix = Matrix4.CreateScale(.2f);
+
+        lampMatrix *= Matrix4.CreateTranslation(lightPosition);
+
+        lampShader.SetMatrix4("model", lampMatrix);
+        lampShader.SetMatrix4("view", camera.GetViewMatrix());
+        lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
+
         GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
@@ -291,9 +265,10 @@ public class Window : GameWindow
         GL.UseProgram(0);
 
         GL.DeleteBuffer(vertexBufferObject);
-        GL.DeleteVertexArray(vertexArrayObject);
+        GL.DeleteVertexArray(vaoLamp);
+        GL.DeleteVertexArray(vaoModel);
 
-        GL.DeleteProgram(shader.Handle);
+        GL.DeleteProgram(lampShader.Handle);
 
         base.OnUnload();
     }
