@@ -25,48 +25,48 @@ public class Window : GameWindow
 
     private readonly float[] vertices =
         {
-            // Позиция
-            -0.5f, -0.5f, -0.5f, // Передняя грань
-             0.5f, -0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
+             // Позиция          Нормаль
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // Передняя грань
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-            -0.5f, -0.5f,  0.5f, // Задняя грань
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // Задняя грань
+             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
-            -0.5f,  0.5f,  0.5f, // Левая грань
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // Левая грань
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-             0.5f,  0.5f,  0.5f, // Правая грань
-             0.5f,  0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // Правая грань
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-            -0.5f, -0.5f, -0.5f, // Нижняя грань
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // Нижняя грань
+             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-            -0.5f,  0.5f, -0.5f, // Верхняя грань
-             0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // Верхняя грань
+             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
         };
 
     private Texture texture;
@@ -109,18 +109,22 @@ public class Window : GameWindow
             vaoModel = GL.GenVertexArray();
             GL.BindVertexArray(vaoModel);
 
-            var vertexLocation = lightingShader.GetAttribLocation("aPos");
-            GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            var positionLocation = lightingShader.GetAttribLocation("aPos");
+            GL.EnableVertexAttribArray(positionLocation);
+            GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            var normalLocation = lightingShader.GetAttribLocation("aNormal");
+            GL.EnableVertexAttribArray(normalLocation);
+            GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
         }
 
         {
             vaoLamp = GL.GenVertexArray();
             GL.BindVertexArray(vaoLamp);
 
-            var vertexLocation = lampShader.GetAttribLocation("aPos");
-            GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            var positionLocation = lampShader.GetAttribLocation("aPos");
+            GL.EnableVertexAttribArray(positionLocation);
+            GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
         }
 
         camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
@@ -154,6 +158,8 @@ public class Window : GameWindow
 
         lightingShader.SetVector3("objectColor", new Vector3(1f, .5f, .31f));
         lightingShader.SetVector3("lightColor", new Vector3(1f, 1f, 1f));
+        lightingShader.SetVector3("lightPos", lightPosition);
+        lightingShader.SetVector3("viewPos", camera.Position);
 
         //Рисуем элементы
         GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
@@ -192,7 +198,12 @@ public class Window : GameWindow
         const float cameraSpeed = 1.5f;
         const float sensitivity = .2f;
 
-        if(input.IsKeyDown(Keys.W))
+        if (input.IsKeyDown(Keys.W))
+        {
+            camera.Position += camera.Front * cameraSpeed * (float)args.Time;
+        }
+        
+        if(input.IsKeyDown(Keys.LeftShift) & input.IsKeyDown(Keys.W))
         {
             camera.Position += camera.Front * cameraSpeed * (float)args.Time;
         }
@@ -217,7 +228,7 @@ public class Window : GameWindow
             camera.Position += camera.Up * cameraSpeed * (float)args.Time;
         }
 
-        if(input.IsKeyDown(Keys.LeftShift))
+        if(input.IsKeyDown(Keys.LeftControl))
         {
             camera.Position -= camera.Up * cameraSpeed * (float)args.Time;
         }
