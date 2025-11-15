@@ -1,9 +1,10 @@
-using System.Diagnostics;
-using OpenTK.Graphics.OpenGL;
+using System;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Windowing.Desktop;
+using System.Diagnostics;
 
 public class Window : GameWindow
 {
@@ -142,8 +143,6 @@ public class Window : GameWindow
     {
         base.OnRenderFrame(args);
 
-        time += 16.0 * args.Time;
-
         //Заливает экран цветом из буффера настроенным из GL.ClearColor
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -156,10 +155,26 @@ public class Window : GameWindow
         lightingShader.SetMatrix4("view", camera.GetViewMatrix());
         lightingShader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
-        lightingShader.SetVector3("objectColor", new Vector3(1f, .5f, .31f));
-        lightingShader.SetVector3("lightColor", new Vector3(1f, 1f, 1f));
-        lightingShader.SetVector3("lightPos", lightPosition);
         lightingShader.SetVector3("viewPos", camera.Position);
+
+        lightingShader.SetVector3("material.ambient", new Vector3(1f, .5f, .31f));
+        lightingShader.SetVector3("material.diffuse", new Vector3(1f, .5f, .31f));
+        lightingShader.SetVector3("material.specular", new Vector3(.5f, .5f, .5f));
+        lightingShader.SetFloat("material.shininess", 32f);
+
+        Vector3 lightColor;
+        float time = DateTime.Now.Second + DateTime.Now.Millisecond / 1000f;
+        lightColor.X = (float)Math.Sin(time * 2.0f);
+        lightColor.Y = (float)Math.Sin(time * 0.7f);
+        lightColor.Z = (float)Math.Sin(time * 1.3f);
+
+        Vector3 ambientColor = lightColor * new Vector3(.2f);
+        Vector3 diffuseColor = lightColor * new Vector3(.5f);
+
+        lightingShader.SetVector3("light.position", lightPosition);
+        lightingShader.SetVector3("light.ambient", ambientColor);
+        lightingShader.SetVector3("light.diffuse", diffuseColor);
+        lightingShader.SetVector3("light.specular", new Vector3(1f, 1f, 1f));
 
         //Рисуем элементы
         GL.DrawArrays(PrimitiveType.Triangles, 0, 36);

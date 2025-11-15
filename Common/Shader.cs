@@ -120,4 +120,10 @@ public class Shader
         GL.UseProgram(Handle);
         GL.Uniform3(uniformLocations[name], data);
     }
+
+    public void SetFloat(string name, float data)
+    {
+        GL.UseProgram(Handle);
+        GL.Uniform1(uniformLocations[name], data);
+    }
 }
