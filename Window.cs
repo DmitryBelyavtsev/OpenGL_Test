@@ -69,6 +69,20 @@ public class Window : GameWindow
             -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
         };
 
+        private readonly Vector3[] cubePositions =
+        {
+            new Vector3(0.0f, 0.0f, 0.0f),
+            new Vector3(2.0f, 5.0f, -15.0f),
+            new Vector3(-1.5f, -2.2f, -2.5f),
+            new Vector3(-3.8f, -2.0f, -12.3f),
+            new Vector3(2.4f, -0.4f, -3.5f),
+            new Vector3(-1.7f, 3.0f, -7.5f),
+            new Vector3(1.3f, -2.0f, -2.5f),
+            new Vector3(1.5f, 2.0f, -2.5f),
+            new Vector3(1.5f, 0.2f, -1.5f),
+            new Vector3(-1.3f, 1.0f, -1.5f)
+        };
+
     private Texture diffuseMap;
     private Texture specularMap;
 
@@ -159,7 +173,7 @@ public class Window : GameWindow
         //Привязываем шейдер
         lightingShader.Use();
 
-        lightingShader.SetMatrix4("model", Matrix4.Identity);
+        //lightingShader.SetMatrix4("model", Matrix4.Identity);
         lightingShader.SetMatrix4("view", camera.GetViewMatrix());
         lightingShader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
@@ -169,27 +183,37 @@ public class Window : GameWindow
         lightingShader.SetInt("material.specular", 1);
         lightingShader.SetFloat("material.shininess", 32f);
 
-        lightingShader.SetVector3("light.position", lightPosition);
+        lightingShader.SetVector3("light.direction", new Vector3(-.2f, -1f, -.3f));
         lightingShader.SetVector3("light.ambient", new Vector3(.2f));
         lightingShader.SetVector3("light.diffuse", new Vector3(.5f));
         lightingShader.SetVector3("light.specular", new Vector3(1f));
 
         //Рисуем элементы
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        for(int i = 0; i < cubePositions.Length; i++)
+        {
+            var model = Matrix4.Identity;
+            model *= Matrix4.CreateTranslation(cubePositions[i]);
+            float angle = 20f * i;
+            model *= Matrix4.CreateFromAxisAngle(new Vector3(1f, .3f, .5f), angle);
+            lightingShader.SetMatrix4("model", model);
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        }
+        
 
         GL.BindVertexArray(vaoLamp);
 
-        lampShader.Use();
+        // lampShader.Use();
 
-        var lampMatrix = Matrix4.CreateScale(.2f);
+        // var lampMatrix = Matrix4.CreateScale(.2f);
 
-        lampMatrix *= Matrix4.CreateTranslation(lightPosition);
+        // lampMatrix *= Matrix4.CreateTranslation(lightPosition);
 
-        lampShader.SetMatrix4("model", lampMatrix);
-        lampShader.SetMatrix4("view", camera.GetViewMatrix());
-        lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
+        // lampShader.SetMatrix4("model", lampMatrix);
+        // lampShader.SetMatrix4("view", camera.GetViewMatrix());
+        // lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        // GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
