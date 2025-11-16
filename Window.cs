@@ -183,7 +183,10 @@ public class Window : GameWindow
         lightingShader.SetInt("material.specular", 1);
         lightingShader.SetFloat("material.shininess", 32f);
 
-        lightingShader.SetVector3("light.direction", new Vector3(-.2f, -1f, -.3f));
+        lightingShader.SetVector3("light.position", lightPosition);
+        lightingShader.SetFloat("light.constant", 1.0f);
+        lightingShader.SetFloat("light.linear", .09f);
+        lightingShader.SetFloat("light.quadratic", .032f);
         lightingShader.SetVector3("light.ambient", new Vector3(.2f));
         lightingShader.SetVector3("light.diffuse", new Vector3(.5f));
         lightingShader.SetVector3("light.specular", new Vector3(1f));
@@ -203,17 +206,17 @@ public class Window : GameWindow
 
         GL.BindVertexArray(vaoLamp);
 
-        // lampShader.Use();
+        lampShader.Use();
 
-        // var lampMatrix = Matrix4.CreateScale(.2f);
+        var lampMatrix = Matrix4.CreateScale(.2f);
 
-        // lampMatrix *= Matrix4.CreateTranslation(lightPosition);
+        lampMatrix *= Matrix4.CreateTranslation(lightPosition);
 
-        // lampShader.SetMatrix4("model", lampMatrix);
-        // lampShader.SetMatrix4("view", camera.GetViewMatrix());
-        // lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
+        lampShader.SetMatrix4("model", lampMatrix);
+        lampShader.SetMatrix4("view", camera.GetViewMatrix());
+        lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
-        // GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
