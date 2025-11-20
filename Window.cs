@@ -182,17 +182,11 @@ public class Window : GameWindow
         lightingShader.SetInt("material.diffuse", 0);
         lightingShader.SetInt("material.specular", 1);
         lightingShader.SetFloat("material.shininess", 32f);
-
-        lightingShader.SetVector3("light.position", camera.Position);
-        lightingShader.SetVector3("light.direction", camera.Front);
-        lightingShader.SetFloat("light.cutOff", MathF.Cos(MathHelper.DegreesToRadians(12.5f)));
-        lightingShader.SetFloat("light.outerCutOff", MathF.Cos(MathHelper.DegreesToRadians(17.5f)));
-        lightingShader.SetFloat("light.constant", 1.0f);
-        lightingShader.SetFloat("light.linear", .09f);
-        lightingShader.SetFloat("light.quadratic", .032f);
-        lightingShader.SetVector3("light.ambient", new Vector3(.2f));
-        lightingShader.SetVector3("light.diffuse", new Vector3(.5f));
-        lightingShader.SetVector3("light.specular", new Vector3(1f));
+        
+        lightingShader.SetVector3("directionLight.direction", new Vector3(-.2f,-1f,-.3f));
+        lightingShader.SetVector3("directionLight.ambient", new Vector3(.05f, .05f, .05f));
+        lightingShader.SetVector3("directionLight.diffuse", new Vector3(.4f, .4f, .4f));
+        lightingShader.SetVector3("directionLight.specular", new Vector3(.5f, .5f, .5f));
 
         //Рисуем элементы
         for(int i = 0; i < cubePositions.Length; i++)

@@ -53,6 +53,8 @@ public class Shader
             var location = GL.GetUniformLocation(Handle, key);
 
             uniformLocations.Add(key, location);
+
+            System.Console.WriteLine(key);
         }
     }
 
