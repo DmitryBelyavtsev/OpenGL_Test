@@ -115,7 +115,12 @@ vec3 CalcPointLight(int i, vec3 normal, vec3 fragPos, vec3 viewDir)
     pointLights[i].quadratic * (distance * distance));
 
     vec3 ambient = pointLights[i].ambient * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse = pointLights[i].diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 specular = pointLights[i].specular * spec * vec3(texture(material.specular, TexCoords));
     ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
 
-    return vec3(0.3, 0.0, 0.0);
+    //return vec3(0.3, 0.0, 0.0);
+    return ambient + diffuse + specular;
 }

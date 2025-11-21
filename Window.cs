@@ -83,6 +83,14 @@ public class Window : GameWindow
             new Vector3(-1.3f, 1.0f, -1.5f)
         };
 
+        private readonly Vector3[] pointLightPositions =
+        {
+            new Vector3(0.7f, 0.2f, 2.0f),
+            new Vector3(2.3f, -3.3f, -4.0f),
+            new Vector3(-4.0f, 2.0f, -12.0f),
+            new Vector3(0.0f, 0.0f, -3.0f)
+        };
+
     private Texture diffuseMap;
     private Texture specularMap;
 
@@ -188,6 +196,18 @@ public class Window : GameWindow
         lightingShader.SetVector3("directionLight.diffuse", new Vector3(.4f, .4f, .4f));
         lightingShader.SetVector3("directionLight.specular", new Vector3(.5f, .5f, .5f));
 
+        for(int i = 0; i < pointLightPositions.Length; i++)
+        {
+            lightingShader.SetVector3($"pointLights[{i}].position", pointLightPositions[i]);
+            lightingShader.SetVector3($"pointLights[{i}].ambient", new Vector3(.05f, .05f, .05f));
+            lightingShader.SetVector3($"pointLights[{i}].diffuse", new Vector3(.8f, .8f, .8f));
+            lightingShader.SetVector3($"pointLights[{i}].specular", new Vector3(1f, 1f, 1f));
+            lightingShader.SetFloat($"pointLights[{i}].constant", 1f);
+            lightingShader.SetFloat($"pointLights[{i}].linear", .09f);
+            lightingShader.SetFloat($"pointLights[{i}].quadratic", .032f);
+        }
+
+
         //Рисуем элементы
         for(int i = 0; i < cubePositions.Length; i++)
         {
@@ -203,17 +223,20 @@ public class Window : GameWindow
 
         GL.BindVertexArray(vaoLamp);
 
-        // lampShader.Use();
+        lampShader.Use();
 
-        // var lampMatrix = Matrix4.CreateScale(.2f);
+        lampShader.SetMatrix4("view", camera.GetViewMatrix());
+        lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
-        // lampMatrix *= Matrix4.CreateTranslation(lightPosition);
+        for(int i = 0; i < pointLightPositions.Length; i++)
+        {
+            var lampMatrix = Matrix4.CreateScale(.2f);
+            lampMatrix *= Matrix4.CreateTranslation(pointLightPositions[i]);
 
-        // lampShader.SetMatrix4("model", lampMatrix);
-        // lampShader.SetMatrix4("view", camera.GetViewMatrix());
-        // lampShader.SetMatrix4("projection", camera.GetProjectionMatrix());
+            lampShader.SetMatrix4("model", lampMatrix);
 
-        // GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        }
 
         //Прошлый кадр фронт буффер новый в бек буффере, меняем их местами чтобы увидеть результат
         SwapBuffers();
