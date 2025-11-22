@@ -23,6 +23,8 @@ public class Window : GameWindow
 
     private Vector2 lastPosition;
 
+    private bool flashLightState = false;
+
     private readonly float[] vertices =
         {
             // Позиции          Нормали              Текстурные координаты
@@ -190,11 +192,15 @@ public class Window : GameWindow
         lightingShader.SetInt("material.diffuse", 0);
         lightingShader.SetInt("material.specular", 1);
         lightingShader.SetFloat("material.shininess", 32f);
+
+         /***********************DIRECTIONLIGHT******************************/
         
         lightingShader.SetVector3("directionLight.direction", new Vector3(-.2f,-1f,-.3f));
         lightingShader.SetVector3("directionLight.ambient", new Vector3(.05f, .05f, .05f));
         lightingShader.SetVector3("directionLight.diffuse", new Vector3(.4f, .4f, .4f));
         lightingShader.SetVector3("directionLight.specular", new Vector3(.5f, .5f, .5f));
+
+         /***********************POINTSLIGHT******************************/
 
         for(int i = 0; i < pointLightPositions.Length; i++)
         {
@@ -207,6 +213,30 @@ public class Window : GameWindow
             lightingShader.SetFloat($"pointLights[{i}].quadratic", .032f);
         }
 
+        /***********************SPOTLIGHT******************************/
+
+        lightingShader.SetFloat("spotLight.constant", 1f);
+        lightingShader.SetFloat("spotLight.linear", .09f);
+        lightingShader.SetFloat("spotLight.quadratic", .032f);
+        lightingShader.SetFloat("spotLight.cutOff", MathF.Cos(MathHelper.DegreesToRadians(12.5f)));
+        lightingShader.SetFloat("spotLight.outerCutOff", MathF.Cos(MathHelper.DegreesToRadians(17.5f)));
+
+        if(flashLightState == true)
+        {
+            lightingShader.SetVector3("spotLight.position", camera.Position);
+            lightingShader.SetVector3("spotLight.direction", camera.Front);
+            lightingShader.SetVector3("spotLight.ambient", new Vector3(0f, 0f, 0f));
+            lightingShader.SetVector3("spotLight.diffuse", new Vector3(1f, 1f, 1f));
+            lightingShader.SetVector3("spotLight.specular", new Vector3(1f, 1f, 1f));
+        }
+        else
+        {
+            lightingShader.SetVector3("spotLight.position", camera.Position);
+            lightingShader.SetVector3("spotLight.direction", camera.Front);
+            lightingShader.SetVector3("spotLight.ambient", Vector3.Zero);
+            lightingShader.SetVector3("spotLight.diffuse", Vector3.Zero);
+            lightingShader.SetVector3("spotLight.specular", Vector3.Zero);
+        }
 
         //Рисуем элементы
         for(int i = 0; i < cubePositions.Length; i++)
@@ -291,6 +321,11 @@ public class Window : GameWindow
         if(input.IsKeyDown(Keys.LeftControl))
         {
             camera.Position -= camera.Up * cameraSpeed * (float)args.Time;
+        }
+
+        if(input.IsKeyPressed(Keys.F))
+        {
+            flashLightState = !flashLightState;
         }
 
         var mouse = MouseState;
